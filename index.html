@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>p5.js Game</title>
+  <!-- Link to p5.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+<body>
+  <h1>Tik-Tac-Toe!</h1>
+
+  <!-- Optional: if you want to place the script in a separate file -->
+  <script src="game.js"></script>
+
+  <!-- Alternatively, you can write the p5.js code directly here -->
+  <script>
+    let board;
+    let currentPlayer;
+    let cellSize = 200;
+
+    function setup() {
+    createCanvas(600, 600);
+    resetGame();   
+    }
+
+    function resetGame() {
+        // Initialize an empty 3x3 board
+        board = [
+            [' ', ' ', ' '],
+            [' ', ' ', ' '],
+            [' ', ' ', ' ']
+        ];
+        currentPlayer = 'O';
+    }
+
+    function draw() {
+        background(255);
+        drawBoard();
+        checkWinner();
+    }
+
+    // Draw the tic-tac-toe grid and pieces
+    function drawBoard() {
+        strokeWeight(4);
+
+        // Draw the grid lines
+        for (let i = 1; i < 3; i++) {
+            line(i * cellSize, 0, i * cellSize, height); // Vertical lines
+            line(0, i * cellSize, width, i * cellSize); // Horizontal lines
+        }
+
+        // Draw X and O on the board
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                let x = j * cellSize + cellSize / 2;
+                let y = i * cellSize + cellSize / 2;
+                let spot = board[i][j];
+                textSize(100);
+                textAlign(CENTER, CENTER);
+
+                if (spot == 'X') {
+                    fill(84, 78, 183);
+                    text('X', x, y);
+                } else if (spot == 'O') {
+                    fill(242, 85, 96);
+                    text('O', x, y);
+                }
+            }
+        }
+    }
+
+    // Check for a winner or a tie
+    function checkWinner() {
+        let winner = null;
+
+        // Check rows and columns for a winner
+        for (let i = 0; i < 3; i++) {
+            if (board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != ' ') {
+                winner = board[i][0];
+            }
+            if (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != ' ') {
+                winner = board[0][i];
+            }
+        }
+
+        // Check diagonals for a winner
+        if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != ' ') {
+            winner = board[0][0];
+        }
+        if (board[2][0] == board[1][1] && board[1][1] == board[0][2] && board[2][0] != ' ') {
+            winner = board[2][0];
+        }
+
+        // Check for a tie
+        let openSpots = 0;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (board[i][j] == ' ') {
+                    openSpots++;
+                }
+            }
+        }
+
+        if (winner == null && openSpots == 0) {
+            winner = 'tie';
+        }
+
+        if (winner != null) {
+            noLoop();
+            let resultText = winner == 'tie' ? "It's a Tie!" : `${winner} Wins!`;
+            createP(resultText).style('font-size', '32pt');
+            createButton('Play Again').mousePressed(() => {
+            resetGame();
+            loop();
+            removeElements(); // Clear the result text and button
+            });
+        }
+    }
+
+    // Handle mouse clicks for placing X or O
+    function mousePressed() {
+        let i = floor(mouseY / cellSize);
+        let j = floor(mouseX / cellSize);
+
+        // Only place if the cell is empty
+        if (board[i][j] == ' ') {
+            board[i][j] = currentPlayer;
+            currentPlayer = currentPlayer == 'X' ? 'O' : 'X';
+        }
+    }
+  </script>
+</body>
+</html>
